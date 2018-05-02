@@ -5,8 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DirectoryTreeExplorer.Presentation"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="DirectoryTreeExplorer" Height="400" Width="600">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="35" />
+            <RowDefinition Height="35" />
+        </Grid.RowDefinitions>
+
+        <TreeView x:Name="MainTreeView" Grid.Row="0" Margin="5" />
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBox x:Name="ChooseXmlFileTextBox" Grid.Column="0" Margin="5 0 5 5" VerticalContentAlignment="Center" />
+            <Button x:Name="ChooseXmlPathButton" Grid.Column="1" Margin="0 0 5 5" Width="80" Content="Browse XML" />
+        </Grid>
+
+        <Button x:Name="ChooseDirectoryButton" Grid.Row="2" Margin="5 0 5 5" Content="CHOOSE DIRECTORY" />
     </Grid>
 </Window>
