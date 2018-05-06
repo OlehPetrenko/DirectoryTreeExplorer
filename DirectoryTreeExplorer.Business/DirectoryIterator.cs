@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace DirectoryTreeExplorer.Business
@@ -9,12 +8,16 @@ namespace DirectoryTreeExplorer.Business
     /// </summary>
     public sealed class DirectoryIterator
     {
-        public List<DirectoryElement> FoundData = new List<DirectoryElement>();
-
-
-        public void IterateThroughDirectoryTree(DirectoryInfo root, int level = 0)
+        public void IterateThroughDirectoryTree(DirectoryInfo root, Action<DirectoryElement> handleFoundElement, int level = 0)
         {
-            AddFoundDirectoryElement(root.Name, level);
+            const int rootLevelNumber = 0;
+            var nextLevelNumber = level + 1;
+
+            //
+            // Skip root directory.
+            //
+            if (level != rootLevelNumber)
+                handleFoundElement(CreateDirectoryElement(root, level));
 
             FileInfo[] files = null;
 
@@ -36,22 +39,33 @@ namespace DirectoryTreeExplorer.Business
 
             foreach (var dirInfo in subDirs)
             {
-                IterateThroughDirectoryTree(dirInfo, level + 1);
+                IterateThroughDirectoryTree(dirInfo, handleFoundElement, nextLevelNumber);
             }
 
             foreach (var file in files)
             {
-                AddFoundDirectoryElement(file.Name, level + 1);
+                handleFoundElement(CreateDirectoryElement(file, nextLevelNumber));
             }
         }
 
-        private void AddFoundDirectoryElement(string name, int level)
+        private DirectoryElement CreateDirectoryElement(FileInfo file, int level)
         {
-            FoundData.Add(new DirectoryElement
-            {
-                Name = name,
-                Level = level
-            });
+            return
+                new DirectoryElement
+                {
+                    Name = file.Name,
+                    Level = level
+                };
+        }
+
+        private DirectoryElement CreateDirectoryElement(DirectoryInfo directory, int level)
+        {
+            return
+                new DirectoryElement
+                {
+                    Name = directory.Name,
+                    Level = level
+                };
         }
     }
 }
