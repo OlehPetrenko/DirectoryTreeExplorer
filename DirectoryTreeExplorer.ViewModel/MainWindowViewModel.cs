@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -19,16 +18,26 @@ namespace DirectoryTreeExplorer.ViewModel
         private readonly object _lock = new object();
         private readonly IterateDirectoryHelper _iterateDirectoryHelper;
 
-
         public ObservableCollection<Node> Nodes { get; set; }
 
         public ICommand ClickCommandChooseDirectory { get; }
+
+
+        public MainWindowViewModel()
+        {
+            _iterateDirectoryHelper = new IterateDirectoryHelper();
+
+            Nodes = new ObservableCollection<Node>();
+            BindingOperations.EnableCollectionSynchronization(Nodes, _lock);
+
+            this.ClickCommandChooseDirectory = new Command(this.ClickMethodChooseDirectory);
+        }
 
         private async void ClickMethodChooseDirectory()
         {
             _iterateDirectoryHelper.StartIteration(@"D:\");
 
-            await Task.Run(() => FillNodes(_iterateDirectoryHelper.FoundData));
+            await Task.Run(() => FillNodes(_iterateDirectoryHelper.FoundDataForTreeView));
         }
 
         private void FillNodes(IQueue<DirectoryElement> directoryElements)
@@ -49,7 +58,6 @@ namespace DirectoryTreeExplorer.ViewModel
                 DirectoryElement currentElement;
                 while (!directoryElements.TryDequeue(out currentElement)) ;
 
-
                 var currentNode = new Node(currentElement.Name, currentElement.Level);
 
                 if (currentNode.Level == topLevelNumber)
@@ -66,17 +74,6 @@ namespace DirectoryTreeExplorer.ViewModel
             }
 
             Nodes.Add(currentRootNode);
-        }
-
-
-        public MainWindowViewModel()
-        {
-            _iterateDirectoryHelper = new IterateDirectoryHelper();
-
-            Nodes = new ObservableCollection<Node>();
-            BindingOperations.EnableCollectionSynchronization(Nodes, _lock);
-
-            this.ClickCommandChooseDirectory = new Command(this.ClickMethodChooseDirectory);
         }
     }
 }

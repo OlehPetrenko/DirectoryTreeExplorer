@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using DirectoryTreeExplorer.Business.LockFreeQueue;
@@ -12,8 +11,16 @@ namespace DirectoryTreeExplorer.Business
     public sealed class IterateDirectoryHelper
     {
         private Thread _iterateDirectoryThread;
-        
-        public IQueue<DirectoryElement> FoundData = new LockFreeQueue<DirectoryElement>(); 
+
+        public IQueue<DirectoryElement> FoundDataForTreeView { get; }
+        public IQueue<DirectoryElement> FoundDataForXml { get; }
+
+
+        public IterateDirectoryHelper()
+        {
+            FoundDataForTreeView = new LockFreeQueue<DirectoryElement>();
+            FoundDataForXml = new LockFreeQueue<DirectoryElement>();
+        }
 
         public bool IsIterationActive => _iterateDirectoryThread.IsAlive;
 
@@ -31,7 +38,8 @@ namespace DirectoryTreeExplorer.Business
 
         private void AddFoundElement(DirectoryElement foundElement)
         {
-            FoundData.Enqueue(foundElement);
+            FoundDataForTreeView.Enqueue(foundElement);
+            FoundDataForXml.Enqueue(foundElement);
         }
     }
 }
