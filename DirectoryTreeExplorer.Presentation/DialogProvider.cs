@@ -9,14 +9,24 @@ namespace DirectoryTreeExplorer.Presentation
     /// </summary>
     public sealed class DialogProvider : IDialogProvider
     {
+        public string SaveFileDialog()
+        {
+            var dialog = new SaveFileDialog
+            {
+                Filter = @"XML files (*.xml)|*.xml"
+            };
+
+            return dialog.ShowDialog() == DialogResult.OK ? dialog.FileName : string.Empty;
+        }
+
         public string ShowFolderBrowserDialog()
         {
-            var fbd = new FolderBrowserDialog
+            var dialog = new FolderBrowserDialog
             {
                 Description = @"Please choose a folder to iterate through."
             };
 
-            return fbd.ShowDialog() == DialogResult.OK ? fbd.SelectedPath : string.Empty;
+            return dialog.ShowDialog() == DialogResult.OK ? dialog.SelectedPath : string.Empty;
         }
     }
 }

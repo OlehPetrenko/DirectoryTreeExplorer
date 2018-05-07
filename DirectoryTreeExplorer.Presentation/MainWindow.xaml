@@ -28,10 +28,11 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBox x:Name="ChooseXmlFileTextBox" Grid.Column="0" Margin="5 0 5 5" VerticalContentAlignment="Center" />
-            <Button x:Name="ChooseXmlPathButton" Grid.Column="1" Margin="0 0 5 5" Width="80" Content="Browse XML" />
+            <TextBox x:Name="ChooseXmlFileTextBox" Grid.Column="0" Margin="5 0 5 5" VerticalContentAlignment="Center" 
+                     Text="{Binding Path=XmlPath, UpdateSourceTrigger=PropertyChanged}" />
+            <Button x:Name="ChooseXmlPathButton" Grid.Column="1" Margin="0 0 5 5" Width="80" Content="Browse XML" Command="{Binding ClickCommandBrowseXml}" />
         </Grid>
 
-        <Button x:Name="ChooseDirectoryButton" Grid.Row="2" Margin="5 0 5 5" Content="CHOOSE DIRECTORY" Command="{Binding ClickCommandChooseDirectory}"/>
+        <Button x:Name="ChooseDirectoryButton" Grid.Row="2" Margin="5 0 5 5" Content="CHOOSE DIRECTORY" Command="{Binding ClickCommandChooseDirectory}" />
     </Grid>
 </Window>

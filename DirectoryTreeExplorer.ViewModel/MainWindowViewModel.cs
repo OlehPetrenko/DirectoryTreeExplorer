@@ -17,11 +17,14 @@ namespace DirectoryTreeExplorer.ViewModel
     public sealed class MainWindowViewModel : ViewModelBase
     {
         private readonly object _lock = new object();
+        private string _xmlPath;
+
         private readonly IterateDirectoryHelper _iterateDirectoryHelper;
         private readonly IDialogProvider _dialogProvider;
 
-        public ObservableCollection<Node> Nodes { get; set; }
+        public ObservableCollection<Node> Nodes { get; }
 
+        public ICommand ClickCommandBrowseXml { get; }
         public ICommand ClickCommandChooseDirectory { get; }
 
 
@@ -33,19 +36,21 @@ namespace DirectoryTreeExplorer.ViewModel
             Nodes = new ObservableCollection<Node>();
             BindingOperations.EnableCollectionSynchronization(Nodes, _lock);
 
+            this.ClickCommandBrowseXml = new Command(this.ClickMethodBrowseXml);
             this.ClickCommandChooseDirectory = new Command(this.ClickMethodChooseDirectory);
         }
 
-        private async void ClickMethodChooseDirectory()
+        public string XmlPath
         {
-            var path = _dialogProvider.ShowFolderBrowserDialog();
+            get => _xmlPath;
+            set
+            {
+                if (_xmlPath == value)
+                    return;
 
-            if(!Directory.Exists(path))
-                return;
-
-            _iterateDirectoryHelper.StartIteration(path);
-
-            await Task.Run(() => FillNodes(_iterateDirectoryHelper.FoundDataForTreeView));
+                _xmlPath = value;
+                OnPropertyChanged(nameof(XmlPath));
+            }
         }
 
         private void FillNodes(IQueue<DirectoryElement> directoryElements)
@@ -82,6 +87,23 @@ namespace DirectoryTreeExplorer.ViewModel
             }
 
             Nodes.Add(currentRootNode);
+        }
+
+        private async void ClickMethodChooseDirectory()
+        {
+            var path = _dialogProvider.ShowFolderBrowserDialog();
+
+            if (!Directory.Exists(path))
+                return;
+
+            _iterateDirectoryHelper.StartIteration(path);
+
+            await Task.Run(() => FillNodes(_iterateDirectoryHelper.FoundDataForTreeView));
+        }
+
+        private void ClickMethodBrowseXml()
+        {
+            XmlPath = _dialogProvider.SaveFileDialog();
         }
     }
 }

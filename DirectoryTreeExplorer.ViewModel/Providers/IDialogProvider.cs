@@ -7,6 +7,7 @@ namespace DirectoryTreeExplorer.ViewModel.Providers
     /// </summary>
     public interface IDialogProvider
     {
+        string SaveFileDialog();
         string ShowFolderBrowserDialog();
     }
 }
