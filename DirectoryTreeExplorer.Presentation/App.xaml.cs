@@ -15,7 +15,7 @@ namespace DirectoryTreeExplorer.Presentation
         {
             var mainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel()
+                DataContext = new MainWindowViewModel(new DialogProvider())
             };
 
             mainWindow.Show();

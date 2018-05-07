@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
 using DirectoryTreeExplorer.Business;
 using DirectoryTreeExplorer.Business.LockFreeQueue;
+using DirectoryTreeExplorer.ViewModel.Providers;
 
 namespace DirectoryTreeExplorer.ViewModel
 {
@@ -17,15 +18,17 @@ namespace DirectoryTreeExplorer.ViewModel
     {
         private readonly object _lock = new object();
         private readonly IterateDirectoryHelper _iterateDirectoryHelper;
+        private readonly IDialogProvider _dialogProvider;
 
         public ObservableCollection<Node> Nodes { get; set; }
 
         public ICommand ClickCommandChooseDirectory { get; }
 
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(IDialogProvider folderBrowserDialogProvider)
         {
             _iterateDirectoryHelper = new IterateDirectoryHelper();
+            _dialogProvider = folderBrowserDialogProvider;
 
             Nodes = new ObservableCollection<Node>();
             BindingOperations.EnableCollectionSynchronization(Nodes, _lock);
@@ -35,7 +38,12 @@ namespace DirectoryTreeExplorer.ViewModel
 
         private async void ClickMethodChooseDirectory()
         {
-            _iterateDirectoryHelper.StartIteration(@"D:\");
+            var path = _dialogProvider.ShowFolderBrowserDialog();
+
+            if(!Directory.Exists(path))
+                return;
+
+            _iterateDirectoryHelper.StartIteration(path);
 
             await Task.Run(() => FillNodes(_iterateDirectoryHelper.FoundDataForTreeView));
         }
