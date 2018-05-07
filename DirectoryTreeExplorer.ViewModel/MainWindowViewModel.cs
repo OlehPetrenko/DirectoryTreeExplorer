@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
 using DirectoryTreeExplorer.Business;
+using DirectoryTreeExplorer.Business.LockFreeQueue;
 
 namespace DirectoryTreeExplorer.ViewModel
 {
@@ -30,7 +31,7 @@ namespace DirectoryTreeExplorer.ViewModel
             await Task.Run(() => FillNodes(_iterateDirectoryHelper.FoundData));
         }
 
-        private void FillNodes(ConcurrentQueue<DirectoryElement> directoryElements)
+        private void FillNodes(IQueue<DirectoryElement> directoryElements)
         {
             const int topLevelNumber = 1;
 
@@ -43,7 +44,7 @@ namespace DirectoryTreeExplorer.ViewModel
 
             cachedLastUsedNodes[currentRootNode.Level] = currentRootNode;
 
-            while (_iterateDirectoryHelper.IsIterationActive || directoryElements.Any())
+            while (_iterateDirectoryHelper.IsIterationActive || !directoryElements.IsEmpty)
             {
                 DirectoryElement currentElement;
                 while (!directoryElements.TryDequeue(out currentElement)) ;

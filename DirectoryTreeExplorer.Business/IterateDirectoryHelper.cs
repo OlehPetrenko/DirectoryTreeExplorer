@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
+using DirectoryTreeExplorer.Business.LockFreeQueue;
 
 namespace DirectoryTreeExplorer.Business
 {
@@ -12,7 +13,7 @@ namespace DirectoryTreeExplorer.Business
     {
         private Thread _iterateDirectoryThread;
         
-        public ConcurrentQueue<DirectoryElement> FoundData = new ConcurrentQueue<DirectoryElement>();
+        public IQueue<DirectoryElement> FoundData = new LockFreeQueue<DirectoryElement>(); 
 
         public bool IsIterationActive => _iterateDirectoryThread.IsAlive;
 
