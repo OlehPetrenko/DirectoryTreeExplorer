@@ -8,16 +8,14 @@ namespace DirectoryTreeExplorer.Business
     /// </summary>
     public sealed class DirectoryIterator
     {
+        private const int RootLevelNumber = 0;
+
+
         public void IterateThroughDirectoryTree(DirectoryInfo root, Action<DirectoryElement> handleFoundElement, int level = 0)
         {
-            const int rootLevelNumber = 0;
             var nextLevelNumber = level + 1;
 
-            //
-            // Skip root directory.
-            //
-            if (level != rootLevelNumber)
-                handleFoundElement(CreateDirectoryElement(root, level));
+            handleFoundElement(new DirectoryElement(root, level, level == RootLevelNumber ? DirectoryElementKind.Root : DirectoryElementKind.Directory));
 
             FileInfo[] files = null;
 
@@ -42,30 +40,10 @@ namespace DirectoryTreeExplorer.Business
                 IterateThroughDirectoryTree(dirInfo, handleFoundElement, nextLevelNumber);
             }
 
-            foreach (var file in files)
+            foreach (var fileInfo in files)
             {
-                handleFoundElement(CreateDirectoryElement(file, nextLevelNumber));
+                handleFoundElement(new DirectoryElement(fileInfo, nextLevelNumber, DirectoryElementKind.File));
             }
-        }
-
-        private DirectoryElement CreateDirectoryElement(FileInfo file, int level)
-        {
-            return
-                new DirectoryElement
-                {
-                    Name = file.Name,
-                    Level = level
-                };
-        }
-
-        private DirectoryElement CreateDirectoryElement(DirectoryInfo directory, int level)
-        {
-            return
-                new DirectoryElement
-                {
-                    Name = directory.Name,
-                    Level = level
-                };
         }
     }
 }

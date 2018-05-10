@@ -19,8 +19,10 @@ namespace DirectoryTreeExplorer.ViewModel
         private readonly object _lock = new object();
         private string _xmlPath;
 
-        private readonly IterateDirectoryHelper _iterateDirectoryHelper;
         private readonly IDialogProvider _dialogProvider;
+
+        private readonly IterateDirectoryHelper _iterateDirectoryHelper;
+        private readonly XmlCreator _xmlCreator;
 
         public ObservableCollection<Node> Nodes { get; }
 
@@ -30,8 +32,9 @@ namespace DirectoryTreeExplorer.ViewModel
 
         public MainWindowViewModel(IDialogProvider folderBrowserDialogProvider)
         {
-            _iterateDirectoryHelper = new IterateDirectoryHelper();
             _dialogProvider = folderBrowserDialogProvider;
+            _iterateDirectoryHelper = new IterateDirectoryHelper();
+            _xmlCreator = new XmlCreator();
 
             Nodes = new ObservableCollection<Node>();
             BindingOperations.EnableCollectionSynchronization(Nodes, _lock);
@@ -45,7 +48,7 @@ namespace DirectoryTreeExplorer.ViewModel
             get => _xmlPath;
             set
             {
-                if (_xmlPath == value)
+                if (string.IsNullOrWhiteSpace(value) || _xmlPath == value)
                     return;
 
                 _xmlPath = value;
@@ -59,6 +62,18 @@ namespace DirectoryTreeExplorer.ViewModel
 
             var cachedLastUsedNodes = new Dictionary<int, Node>();
 
+            //
+            // Skip a main root directory.
+            // Not needed to show it on the UI.
+            //
+            while (!directoryElements.TryDequeue(out var mainRootElement)) ;
+
+            while (directoryElements.IsEmpty)
+            {
+                if (!_iterateDirectoryHelper.IsIterationActive)
+                    return;
+            }
+
             DirectoryElement currentRootElement;
             while (!directoryElements.TryDequeue(out currentRootElement)) ;
 
@@ -66,10 +81,12 @@ namespace DirectoryTreeExplorer.ViewModel
 
             cachedLastUsedNodes[currentRootNode.Level] = currentRootNode;
 
-            while (_iterateDirectoryHelper.IsIterationActive || !directoryElements.IsEmpty)
+            while (!directoryElements.IsEmpty || _iterateDirectoryHelper.IsIterationActive)
             {
-                DirectoryElement currentElement;
-                while (!directoryElements.TryDequeue(out currentElement)) ;
+                if (directoryElements.IsEmpty)
+                    continue;
+
+                directoryElements.TryDequeue(out var currentElement);
 
                 var currentNode = new Node(currentElement.Name, currentElement.Level);
 
@@ -99,6 +116,8 @@ namespace DirectoryTreeExplorer.ViewModel
             _iterateDirectoryHelper.StartIteration(path);
 
             await Task.Run(() => FillNodes(_iterateDirectoryHelper.FoundDataForTreeView));
+
+            _xmlCreator.Create(_xmlPath, _iterateDirectoryHelper.FoundDataForXml, () => _iterateDirectoryHelper.IsIterationActive);
         }
 
         private void ClickMethodBrowseXml()
