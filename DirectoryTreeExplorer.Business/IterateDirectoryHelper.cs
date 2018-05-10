@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using DirectoryTreeExplorer.Business.LockFreeQueue;
+using DirectoryTreeExplorer.Business.Logs;
 
 namespace DirectoryTreeExplorer.Business
 {
@@ -10,14 +11,18 @@ namespace DirectoryTreeExplorer.Business
     /// </summary>
     public sealed class IterateDirectoryHelper
     {
+        private readonly ILogProvider _logProvider;
+
         private Thread _iterateDirectoryThread;
 
         public IQueue<DirectoryElement> FoundDataForTreeView { get; }
         public IQueue<DirectoryElement> FoundDataForXml { get; }
 
 
-        public IterateDirectoryHelper()
+        public IterateDirectoryHelper(ILogProvider logProvider = null)
         {
+            _logProvider = logProvider;
+
             FoundDataForTreeView = new LockFreeQueue<DirectoryElement>();
             FoundDataForXml = new LockFreeQueue<DirectoryElement>();
         }
@@ -32,8 +37,12 @@ namespace DirectoryTreeExplorer.Business
 
         private void IterateThroughDirectory(object path)
         {
+            _logProvider?.Log($"Iteration of '{path}' has been started.");
+
             var iterator = new DirectoryIterator();
             iterator.IterateThroughDirectoryTree(new DirectoryInfo((string)path), AddFoundElement);
+
+            _logProvider?.Log($"Iteration of '{path}' has been finished.");
         }
 
         private void AddFoundElement(DirectoryElement foundElement)

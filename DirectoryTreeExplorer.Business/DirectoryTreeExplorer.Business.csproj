@@ -46,6 +46,8 @@
     <Compile Include="LockFreeQueue\IQueue.cs" />
     <Compile Include="LockFreeQueue\LockFreeQueue.cs" />
     <Compile Include="LockFreeQueue\LockFreeQueueItem.cs" />
+    <Compile Include="Logs\ExternalHandlerLogProvider.cs" />
+    <Compile Include="Logs\ILogProvider.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DirectoryElement.cs" />

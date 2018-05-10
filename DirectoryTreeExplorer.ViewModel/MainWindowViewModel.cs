@@ -7,6 +7,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using DirectoryTreeExplorer.Business;
 using DirectoryTreeExplorer.Business.LockFreeQueue;
+using DirectoryTreeExplorer.Business.Logs;
 using DirectoryTreeExplorer.ViewModel.Providers;
 
 namespace DirectoryTreeExplorer.ViewModel
@@ -19,12 +20,14 @@ namespace DirectoryTreeExplorer.ViewModel
         private readonly object _lock = new object();
         private string _xmlPath;
 
+        private readonly ILogProvider _logProvider;
         private readonly IDialogProvider _dialogProvider;
 
         private readonly IterateDirectoryHelper _iterateDirectoryHelper;
         private readonly XmlCreator _xmlCreator;
 
         public ObservableCollection<Node> Nodes { get; }
+        public List<string> Logs { get; }
 
         public ICommand ClickCommandBrowseXml { get; }
         public ICommand ClickCommandChooseDirectory { get; }
@@ -33,10 +36,13 @@ namespace DirectoryTreeExplorer.ViewModel
         public MainWindowViewModel(IDialogProvider folderBrowserDialogProvider)
         {
             _dialogProvider = folderBrowserDialogProvider;
-            _iterateDirectoryHelper = new IterateDirectoryHelper();
-            _xmlCreator = new XmlCreator();
+            _logProvider = new ExternalHandlerLogProvider(AddLog);
+            _iterateDirectoryHelper = new IterateDirectoryHelper(_logProvider);
+            _xmlCreator = new XmlCreator(_logProvider);
 
             Nodes = new ObservableCollection<Node>();
+            Logs = new List<string>();
+
             BindingOperations.EnableCollectionSynchronization(Nodes, _lock);
 
             this.ClickCommandBrowseXml = new Command(this.ClickMethodBrowseXml);
@@ -56,8 +62,16 @@ namespace DirectoryTreeExplorer.ViewModel
             }
         }
 
+        private void AddLog(string message)
+        {
+            Logs.Add($"{DateTime.Now.TimeOfDay}: {message}");
+            OnPropertyChanged(nameof(Logs));
+        }
+
         private void FillNodes(IQueue<DirectoryElement> directoryElements)
         {
+            _logProvider.Log("TreeView filling has been started.");
+
             const int topLevelNumber = 1;
 
             var cachedLastUsedNodes = new Dictionary<int, Node>();
@@ -104,6 +118,8 @@ namespace DirectoryTreeExplorer.ViewModel
             }
 
             Nodes.Add(currentRootNode);
+
+            _logProvider.Log("TreeView filling has been finished.");
         }
 
         private async void ClickMethodChooseDirectory()
@@ -115,9 +131,9 @@ namespace DirectoryTreeExplorer.ViewModel
 
             _iterateDirectoryHelper.StartIteration(path);
 
-            await Task.Run(() => FillNodes(_iterateDirectoryHelper.FoundDataForTreeView));
-
             _xmlCreator.Create(_xmlPath, _iterateDirectoryHelper.FoundDataForXml, () => _iterateDirectoryHelper.IsIterationActive);
+
+            await Task.Run(() => FillNodes(_iterateDirectoryHelper.FoundDataForTreeView));
         }
 
         private void ClickMethodBrowseXml()

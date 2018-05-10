@@ -6,7 +6,7 @@ namespace DirectoryTreeExplorer.Business.LockFreeQueue
 {
     /// <summary>
     /// Represents a lock free FIFO collection. 
-    /// Use it instead of <see cref="ConcurrentQueue{T}"/> if needed.
+    /// Use it to avoid <see cref="ConcurrentQueue{T}"/> in some specific cases.
     /// </summary>
     /// <typeparam name="T">The type of the elements contained in the queue.</typeparam>
     public sealed class LockFreeQueue<T> : IQueue<T> where T : class, new()

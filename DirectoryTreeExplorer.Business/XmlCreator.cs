@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Xml.Linq;
 using DirectoryTreeExplorer.Business.LockFreeQueue;
+using DirectoryTreeExplorer.Business.Logs;
 
 namespace DirectoryTreeExplorer.Business
 {
@@ -11,6 +12,14 @@ namespace DirectoryTreeExplorer.Business
     /// </summary>
     public sealed class XmlCreator
     {
+        private readonly ILogProvider _logProvider;
+
+
+        public XmlCreator(ILogProvider logProvider = null)
+        {
+            _logProvider = logProvider;
+        }
+
         public void Create(string path, IQueue<DirectoryElement> directoryElements, Func<bool> isIterationActive)
         {
             var createDocumentThread = new Thread(() => CreateInternal(path, directoryElements, isIterationActive))
@@ -22,6 +31,8 @@ namespace DirectoryTreeExplorer.Business
 
         private void CreateInternal(string path, IQueue<DirectoryElement> directoryElements, Func<bool> isIterationActive)
         {
+            _logProvider?.Log("XML creation has been started.");
+
             const int rootLevelNumber = 0;
 
             var cachedLastXmlElements = new Dictionary<int, XElement>();
@@ -51,6 +62,8 @@ namespace DirectoryTreeExplorer.Business
             document.Add(lastUsedXmlElement);
 
             document.Save(path);
+
+            _logProvider?.Log($"XML creation has been finished. (File path: '{path}').");
         }
 
         private void UpdateDirectoriesSize(DirectoryElement directoryElement, Dictionary<int, XElement> cachedLastXmlElements)
