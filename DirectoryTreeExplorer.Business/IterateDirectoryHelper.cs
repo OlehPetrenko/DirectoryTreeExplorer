@@ -7,7 +7,7 @@ using DirectoryTreeExplorer.Business.Logs;
 namespace DirectoryTreeExplorer.Business
 {
     /// <summary>
-    /// Provides logic to begin directory iteration process.
+    /// Represents a logic to begin directory iteration process.
     /// </summary>
     public sealed class IterateDirectoryHelper
     {
@@ -19,6 +19,8 @@ namespace DirectoryTreeExplorer.Business
         public IQueue<DirectoryElement> FoundDataForXml { get; }
 
 
+        public bool IsIterationActive => _iterateDirectoryThread.IsAlive;
+        
         public IterateDirectoryHelper(ILogProvider logProvider = null)
         {
             _logProvider = logProvider;
@@ -26,8 +28,6 @@ namespace DirectoryTreeExplorer.Business
             FoundDataForTreeView = new LockFreeQueue<DirectoryElement>();
             FoundDataForXml = new LockFreeQueue<DirectoryElement>();
         }
-
-        public bool IsIterationActive => _iterateDirectoryThread.IsAlive;
 
         public void StartIteration(string path)
         {

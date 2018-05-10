@@ -14,6 +14,7 @@ namespace DirectoryTreeExplorer.Business.LockFreeQueue
         private LockFreeQueueItem<T> _head;
         private LockFreeQueueItem<T> _tail;
 
+
         public bool IsEmpty => _head == _tail;
 
         public LockFreeQueue()

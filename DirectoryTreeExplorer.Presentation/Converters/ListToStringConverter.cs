@@ -9,7 +9,7 @@ namespace DirectoryTreeExplorer.Presentation.Converters
     /// Represents a converter to convert collection of strings to string.
     /// </summary>
     [ValueConversion(typeof(IEnumerable<string>), typeof(string))]
-    public sealed class ListToStringConverter : IValueConverter
+    internal sealed class ListToStringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

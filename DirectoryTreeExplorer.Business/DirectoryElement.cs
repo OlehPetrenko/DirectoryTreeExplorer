@@ -11,8 +11,8 @@ namespace DirectoryTreeExplorer.Business
     {
         private readonly FileSystemInfo _info;
 
-        public string Name => _info.Name;
 
+        public string Name => _info.Name;
         public DateTime CreationTime => _info.CreationTime;
         public DateTime ModificationTime => _info.LastWriteTime;
         public DateTime LastAccessTime => _info.LastAccessTime;

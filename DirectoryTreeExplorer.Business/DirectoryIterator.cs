@@ -4,9 +4,9 @@ using System.IO;
 namespace DirectoryTreeExplorer.Business
 {
     /// <summary>
-    /// Generates and provides data about found elements in a directory.
+    /// Represents a generator and provider data about found elements in a directory.
     /// </summary>
-    public sealed class DirectoryIterator
+    internal sealed class DirectoryIterator
     {
         private const int RootLevelNumber = 0;
 

@@ -6,7 +6,7 @@ namespace DirectoryTreeExplorer.Business.LockFreeQueue
     /// Represents a item for <see cref="LockFreeQueue{T}"/>. 
     /// </summary>
     /// <typeparam name="T">The type of the data contained in the item.</typeparam>
-    public sealed class LockFreeQueueItem<T> where T : class, new()
+    internal sealed class LockFreeQueueItem<T> where T : class, new()
     {
         public T Data { get; set; }
         public LockFreeQueueItem<T> Next { get; set; }

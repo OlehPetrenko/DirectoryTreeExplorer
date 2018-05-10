@@ -9,14 +9,15 @@ namespace DirectoryTreeExplorer.Business.Logs
     {
         private readonly Action<string> _addLogAction;
 
-        public void Log(string message)
-        {
-            _addLogAction(message);
-        }
 
         public ExternalHandlerLogProvider(Action<string> addLogAction)
         {
             _addLogAction = addLogAction;
+        }
+
+        public void Log(string message)
+        {
+            _addLogAction(message);
         }
     }
 }
