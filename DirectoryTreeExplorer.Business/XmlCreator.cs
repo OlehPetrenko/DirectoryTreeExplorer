@@ -32,9 +32,9 @@ namespace DirectoryTreeExplorer.Business
 
         private void CreateInternal(string path, IQueue<DirectoryElement> directoryElements, Func<bool> isIterationActive)
         {
-            if (Directory.Exists(path))
+            if (!File.Exists(path))
             {
-                _logProvider?.Log("Path of xml-file is invalid.");
+                _logProvider?.Log("Path of XML-file is invalid.");
                 return;
             }
 

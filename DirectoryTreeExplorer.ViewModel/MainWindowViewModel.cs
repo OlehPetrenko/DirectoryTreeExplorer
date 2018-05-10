@@ -68,6 +68,12 @@ namespace DirectoryTreeExplorer.ViewModel
             OnPropertyChanged(nameof(Logs));
         }
 
+        private void ClearData()
+        {
+            Nodes.Clear();
+            Logs.Clear();
+        }
+
         private void FillNodes(IQueue<DirectoryElement> directoryElements)
         {
             _logProvider.Log("TreeView filling has been started.");
@@ -128,6 +134,8 @@ namespace DirectoryTreeExplorer.ViewModel
 
             if (!Directory.Exists(path))
                 return;
+
+            ClearData();
 
             _iterateDirectoryHelper.StartIteration(path);
 
