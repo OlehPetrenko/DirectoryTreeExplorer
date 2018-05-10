@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Xml.Linq;
 using DirectoryTreeExplorer.Business.LockFreeQueue;
@@ -31,6 +32,12 @@ namespace DirectoryTreeExplorer.Business
 
         private void CreateInternal(string path, IQueue<DirectoryElement> directoryElements, Func<bool> isIterationActive)
         {
+            if (Directory.Exists(path))
+            {
+                _logProvider?.Log("Path of xml-file is invalid.");
+                return;
+            }
+
             _logProvider?.Log("XML creation has been started.");
 
             const int rootLevelNumber = 0;

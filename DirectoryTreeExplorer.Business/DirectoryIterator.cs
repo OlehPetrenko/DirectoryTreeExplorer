@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using DirectoryTreeExplorer.Business.Logs;
 
 namespace DirectoryTreeExplorer.Business
 {
@@ -10,6 +11,13 @@ namespace DirectoryTreeExplorer.Business
     {
         private const int RootLevelNumber = 0;
 
+        private readonly ILogProvider _logProvider;
+
+
+        public DirectoryIterator(ILogProvider logProvider = null)
+        {
+            _logProvider = logProvider;
+        }
 
         public void IterateThroughDirectoryTree(DirectoryInfo root, Action<DirectoryElement> handleFoundElement, int level = 0)
         {
@@ -23,11 +31,9 @@ namespace DirectoryTreeExplorer.Business
             {
                 files = root.GetFiles("*.*");
             }
-            catch (UnauthorizedAccessException)
+            catch (Exception exception)
             {
-            }
-            catch (DirectoryNotFoundException)
-            {
+                _logProvider?.Log(exception.Message);
             }
 
             if (files == null)
