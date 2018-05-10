@@ -86,7 +86,7 @@ namespace DirectoryTreeExplorer.ViewModel
             // Skip a main root directory.
             // Not needed to show it on the UI.
             //
-            while (!directoryElements.TryDequeue(out var mainRootElement)) ;
+            while (!directoryElements.TryDequeue(out var _)) ;
 
             while (directoryElements.IsEmpty)
             {
@@ -97,23 +97,19 @@ namespace DirectoryTreeExplorer.ViewModel
             DirectoryElement currentRootElement;
             while (!directoryElements.TryDequeue(out currentRootElement)) ;
 
-            var currentRootNode = new Node(currentRootElement.Name, currentRootElement.Level);
-
-            cachedLastUsedNodes[currentRootNode.Level] = currentRootNode;
+            cachedLastUsedNodes[currentRootElement.Level] = new Node(currentRootElement.Name, currentRootElement.Level);
 
             while (!directoryElements.IsEmpty || _iterateDirectoryHelper.IsIterationActive)
             {
                 if (directoryElements.IsEmpty)
                     continue;
 
-                directoryElements.TryDequeue(out var currentElement);
-
+                var currentElement = directoryElements.Dequeue();
                 var currentNode = new Node(currentElement.Name, currentElement.Level);
 
                 if (currentNode.Level == topLevelNumber)
                 {
-                    Nodes.Add(currentRootNode);
-                    currentRootNode = currentNode;
+                    Nodes.Add(cachedLastUsedNodes[topLevelNumber]);
                 }
                 else
                 {
@@ -123,9 +119,19 @@ namespace DirectoryTreeExplorer.ViewModel
                 cachedLastUsedNodes[currentNode.Level] = currentNode;
             }
 
-            Nodes.Add(currentRootNode);
+            cachedLastUsedNodes.TryGetValue(topLevelNumber, out var lastUsedTopLevelNode);
+            Nodes.Add(lastUsedTopLevelNode);
 
             _logProvider.Log("TreeView filling has been finished.");
+        }
+
+        private async Task StartProcesses(string path)
+        {
+            _iterateDirectoryHelper.StartIteration(path);
+
+            _xmlCreator.Create(_xmlPath, _iterateDirectoryHelper.FoundDataForXml, () => _iterateDirectoryHelper.IsIterationActive);
+
+            await Task.Run(() => FillNodes(_iterateDirectoryHelper.FoundDataForTreeView));
         }
 
         private async void ClickMethodChooseDirectory()
@@ -137,11 +143,14 @@ namespace DirectoryTreeExplorer.ViewModel
 
             ClearData();
 
-            _iterateDirectoryHelper.StartIteration(path);
-
-            _xmlCreator.Create(_xmlPath, _iterateDirectoryHelper.FoundDataForXml, () => _iterateDirectoryHelper.IsIterationActive);
-
-            await Task.Run(() => FillNodes(_iterateDirectoryHelper.FoundDataForTreeView));
+            try
+            {
+                await StartProcesses(path);
+            }
+            catch (Exception exception)
+            {
+                _logProvider.Log(exception.Message);
+            }
         }
 
         private void ClickMethodBrowseXml()

@@ -50,7 +50,7 @@ namespace DirectoryTreeExplorer.Business
                 if (directoryElements.IsEmpty)
                     continue;
 
-                directoryElements.TryDequeue(out var directoryElement);
+                var directoryElement = directoryElements.Dequeue();
 
                 var xmlElement = CreateXmlElement(directoryElement);
 
@@ -65,7 +65,6 @@ namespace DirectoryTreeExplorer.Business
             }
 
             cachedLastXmlElements.TryGetValue(rootLevelNumber, out var lastUsedXmlElement);
-
             document.Add(lastUsedXmlElement);
 
             document.Save(path);

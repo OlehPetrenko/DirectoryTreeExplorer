@@ -11,6 +11,8 @@ namespace DirectoryTreeExplorer.Business.LockFreeQueue
         bool IsEmpty { get; }
 
         void Enqueue(T item);
+        T Dequeue();
+
         bool TryDequeue(out T item);
     }
 }

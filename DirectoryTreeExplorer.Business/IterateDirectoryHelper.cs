@@ -15,22 +15,25 @@ namespace DirectoryTreeExplorer.Business
 
         private Thread _iterateDirectoryThread;
 
-        public IQueue<DirectoryElement> FoundDataForTreeView { get; }
-        public IQueue<DirectoryElement> FoundDataForXml { get; }
+        public IQueue<DirectoryElement> FoundDataForTreeView { get; private set; }
+        public IQueue<DirectoryElement> FoundDataForXml { get; private set; }
 
 
         public bool IsIterationActive => _iterateDirectoryThread.IsAlive;
-        
+
         public IterateDirectoryHelper(ILogProvider logProvider = null)
         {
             _logProvider = logProvider;
-
-            FoundDataForTreeView = new LockFreeQueue<DirectoryElement>();
-            FoundDataForXml = new LockFreeQueue<DirectoryElement>();
         }
 
         public void StartIteration(string path)
         {
+            if (_iterateDirectoryThread != null && _iterateDirectoryThread.IsAlive)
+                _iterateDirectoryThread.Abort();
+
+            FoundDataForTreeView = new LockFreeQueue<DirectoryElement>();
+            FoundDataForXml = new LockFreeQueue<DirectoryElement>();
+
             _iterateDirectoryThread = new Thread(IterateThroughDirectory) { IsBackground = true };
             _iterateDirectoryThread.Start(path);
         }
