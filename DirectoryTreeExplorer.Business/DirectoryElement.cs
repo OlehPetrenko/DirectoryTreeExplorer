@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Security.AccessControl;
-using System.Security.Principal;
 
 namespace DirectoryTreeExplorer.Business
 {
@@ -11,6 +9,7 @@ namespace DirectoryTreeExplorer.Business
     public sealed class DirectoryElement
     {
         private readonly FileSystemInfo _info;
+        private string _owner;
 
 
         public string Name => _info.Name;
@@ -24,31 +23,10 @@ namespace DirectoryTreeExplorer.Business
         {
             get
             {
-                IdentityReference sid = null;
+                if (string.IsNullOrEmpty(_owner))
+                    _owner = new OwnerProvider().GetOwner(_info.FullName);
 
-                try
-                {
-                    sid = File.GetAccessControl(_info.FullName, AccessControlSections.Owner).GetOwner(typeof(SecurityIdentifier));
-
-                    GlobalCache.Instance.Owners.TryGetValue(sid.Value, out var owner);
-                    if (!string.IsNullOrEmpty(owner))
-                        return owner;
-
-                    var ntAccount = sid.Translate(typeof(NTAccount));
-
-                    GlobalCache.Instance.Owners.Add(sid.Value, ntAccount.ToString());
-
-                    return ntAccount.ToString();
-                }
-                catch (Exception)
-                {
-                    const string notAvailableOwnerText = "Not available";
-
-                    if (sid != null)
-                        GlobalCache.Instance.Owners.Add(sid.Value, notAvailableOwnerText);
-
-                    return notAvailableOwnerText;
-                }
+                return _owner;
             }
         }
 
