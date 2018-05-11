@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="DirectoryElementKind.cs" />
     <Compile Include="DirectoryIterator.cs" />
+    <Compile Include="GlobalCache.cs" />
     <Compile Include="IterateDirectoryHelper.cs" />
     <Compile Include="LockFreeQueue\IQueue.cs" />
     <Compile Include="LockFreeQueue\LockFreeQueue.cs" />
