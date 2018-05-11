@@ -14,6 +14,7 @@ namespace DirectoryTreeExplorer.Business
     public sealed class XmlCreator
     {
         private readonly ILogProvider _logProvider;
+        private Dictionary<int, XmlDirectoryItem> _cachedLastXmlElements;
 
 
         public XmlCreator(ILogProvider logProvider = null)
@@ -42,7 +43,7 @@ namespace DirectoryTreeExplorer.Business
 
             const int rootLevelNumber = 0;
 
-            var cachedLastXmlElements = new Dictionary<int, XElement>();
+            _cachedLastXmlElements = new Dictionary<int, XmlDirectoryItem>();
             var document = new XDocument();
 
             while (!directoryElements.IsEmpty || isIterationActive())
@@ -56,38 +57,60 @@ namespace DirectoryTreeExplorer.Business
 
                 if (directoryElement.Kind != DirectoryElementKind.Root)
                 {
-                    cachedLastXmlElements[directoryElement.Level - 1].Add(xmlElement);
+                    _cachedLastXmlElements[directoryElement.Level - 1].XmlElement.Add(xmlElement);
                 }
 
-                UpdateDirectoriesSize(directoryElement, cachedLastXmlElements);
-
-                cachedLastXmlElements[directoryElement.Level] = xmlElement;
+                UpdateDirectoriesSize(directoryElement);
+                AddDirectoryToCache(directoryElement, xmlElement);
             }
 
-            cachedLastXmlElements.TryGetValue(rootLevelNumber, out var lastUsedXmlElement);
-            document.Add(lastUsedXmlElement);
+            _cachedLastXmlElements.TryGetValue(rootLevelNumber, out var rootXmlElement);
+            SetDirectorySize(rootXmlElement);
+            document.Add(rootXmlElement?.XmlElement);
 
-            document.Save(path);
+            try
+            {
+                document.Save(path);
+            }
+            catch (Exception exception)
+            {
+                _logProvider?.Log(exception.Message);
+                return;
+            }
 
             _logProvider?.Log($"XML creation has been finished. (File path: '{path}').");
         }
 
-        private void UpdateDirectoriesSize(DirectoryElement directoryElement, Dictionary<int, XElement> cachedLastXmlElements)
+        private void AddDirectoryToCache(DirectoryElement directoryElement, XElement xmlElement)
         {
-            if (directoryElement.Kind == DirectoryElementKind.File)
-            {
-                foreach (var lastXmlElement in cachedLastXmlElements)
-                {
-                    if (lastXmlElement.Key < directoryElement.Level)
-                    {
-                        var sizeXmlAttribute = lastXmlElement.Value.Attribute("Size");
+            if (directoryElement.Kind != DirectoryElementKind.Directory && directoryElement.Kind != DirectoryElementKind.Root)
+                return;
 
-                        if (sizeXmlAttribute != null)
-                        {
-                            sizeXmlAttribute.Value = (Convert.ToInt64(sizeXmlAttribute.Value) + directoryElement.Size).ToString();
-                        }
-                    }
-                }
+            _cachedLastXmlElements.TryGetValue(directoryElement.Level, out var cacheItem);
+            SetDirectorySize(cacheItem);
+
+            _cachedLastXmlElements[directoryElement.Level] = new XmlDirectoryItem(xmlElement);
+        }
+
+        private void SetDirectorySize(XmlDirectoryItem cacheItem)
+        {
+            var sizeAttribute = cacheItem?.XmlElement.Attribute("Size");
+
+            if (sizeAttribute != null)
+                sizeAttribute.Value = cacheItem.Size.ToString();
+        }
+
+        private void UpdateDirectoriesSize(DirectoryElement directoryElement)
+        {
+            if (directoryElement.Kind != DirectoryElementKind.File)
+                return;
+
+            foreach (var lastXmlElement in _cachedLastXmlElements)
+            {
+                if (lastXmlElement.Key >= directoryElement.Level)
+                    continue;
+
+                lastXmlElement.Value.Size += directoryElement.Size;
             }
         }
 
@@ -102,6 +125,18 @@ namespace DirectoryTreeExplorer.Business
                     new XAttribute("Attributes", directoryElement.Attributes),
                     new XAttribute("Owner", directoryElement.Owner),
                     new XAttribute("Size", directoryElement.Size));
+        }
+    }
+
+    public class XmlDirectoryItem
+    {
+        public XElement XmlElement { get; }
+        public long Size { get; set; }
+
+        public XmlDirectoryItem(XElement xmlElement, long size = 0)
+        {
+            XmlElement = xmlElement;
+            Size = size;
         }
     }
 }
