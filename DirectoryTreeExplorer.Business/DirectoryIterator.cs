@@ -25,30 +25,21 @@ namespace DirectoryTreeExplorer.Business
 
             handleFoundElement(new DirectoryElement(root, level, level == RootLevelNumber ? DirectoryElementKind.Root : DirectoryElementKind.Directory));
 
-            FileInfo[] files = null;
-
             try
             {
-                files = root.GetFiles("*.*");
+                foreach (var dirInfo in root.EnumerateDirectories())
+                {
+                    IterateThroughDirectoryTree(dirInfo, handleFoundElement, nextLevelNumber);
+                }
+
+                foreach (var fileInfo in root.EnumerateFiles("*.*"))
+                {
+                    handleFoundElement(new DirectoryElement(fileInfo, nextLevelNumber, DirectoryElementKind.File));
+                }
             }
             catch (Exception exception)
             {
                 _logProvider?.Log(exception.Message);
-            }
-
-            if (files == null)
-                return;
-
-            var subDirs = root.GetDirectories();
-
-            foreach (var dirInfo in subDirs)
-            {
-                IterateThroughDirectoryTree(dirInfo, handleFoundElement, nextLevelNumber);
-            }
-
-            foreach (var fileInfo in files)
-            {
-                handleFoundElement(new DirectoryElement(fileInfo, nextLevelNumber, DirectoryElementKind.File));
             }
         }
     }
