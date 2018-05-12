@@ -37,7 +37,7 @@ namespace DirectoryTreeExplorer.Business.LockFreeQueue
         public T Dequeue()
         {
             if (IsEmpty)
-                return null;
+                throw new InvalidOperationException("The Queue is empty.");
 
             Interlocked.Exchange(ref _head, _head.Next);
 

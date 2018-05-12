@@ -42,7 +42,7 @@ namespace DirectoryTreeExplorer.Business
         {
             _logProvider?.Log($"Iteration of '{path}' has been started.");
 
-            var iterator = new DirectoryIterator();
+            var iterator = new DirectoryIterator(_logProvider);
             iterator.IterateThroughDirectoryTree(new DirectoryInfo((string)path), AddFoundElement);
 
             _logProvider?.Log($"Iteration of '{path}' has been finished.");
