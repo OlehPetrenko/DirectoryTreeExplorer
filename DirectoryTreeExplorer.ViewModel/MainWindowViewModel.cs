@@ -54,7 +54,7 @@ namespace DirectoryTreeExplorer.ViewModel
             get => _xmlPath;
             set
             {
-                if (string.IsNullOrWhiteSpace(value) || _xmlPath == value)
+                if (_xmlPath == value)
                     return;
 
                 _xmlPath = value;
@@ -129,7 +129,10 @@ namespace DirectoryTreeExplorer.ViewModel
         {
             _iterateDirectoryHelper.StartIteration(path);
 
-            _xmlCreator.Create(_xmlPath, _iterateDirectoryHelper.FoundDataForXml, () => _iterateDirectoryHelper.IsIterationActive);
+            if (!string.IsNullOrWhiteSpace(_xmlPath))
+            {
+                _xmlCreator.Create(_xmlPath, _iterateDirectoryHelper.FoundDataForXml, () => _iterateDirectoryHelper.IsIterationActive);
+            }
 
             await Task.Run(() => FillNodes(_iterateDirectoryHelper.FoundDataForTreeView));
         }
