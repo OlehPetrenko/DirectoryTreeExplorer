@@ -11,6 +11,7 @@ namespace DirectoryTreeExplorer.Business.LockFreeQueue
         public T Data { get; set; }
         public LockFreeQueueItem<T> Next { get; set; }
 
+
         public LockFreeQueueItem(T data = null, LockFreeQueueItem<T> next = null)
         {
             Data = data;

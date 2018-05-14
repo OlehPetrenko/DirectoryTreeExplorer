@@ -11,7 +11,6 @@ namespace DirectoryTreeExplorer.Business
         private readonly FileSystemInfo _info;
         private string _owner;
 
-
         public string Name => _info.Name;
         public DateTime CreationTime => _info.CreationTime;
         public DateTime ModificationTime => _info.LastWriteTime;
@@ -32,6 +31,7 @@ namespace DirectoryTreeExplorer.Business
 
         public int Level { get; }
         public DirectoryElementKind Kind { get; }
+
 
         public DirectoryElement(FileSystemInfo fileSystemInfo, int level, DirectoryElementKind kind)
             : base()

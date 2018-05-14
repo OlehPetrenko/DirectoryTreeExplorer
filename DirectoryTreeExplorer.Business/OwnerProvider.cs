@@ -12,6 +12,7 @@ namespace DirectoryTreeExplorer.Business
     {
         private const string NotAvailableOwnerText = "Not available";
 
+
         public string GetOwner(string path)
         {
             IdentityReference sid = null;

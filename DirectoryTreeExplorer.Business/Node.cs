@@ -12,6 +12,7 @@ namespace DirectoryTreeExplorer.Business
 
         public int Level { get; set; }
 
+
         public Node(string name, int level)
         {
             Name = name;

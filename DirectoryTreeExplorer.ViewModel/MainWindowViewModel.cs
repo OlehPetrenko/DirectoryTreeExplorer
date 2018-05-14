@@ -26,11 +26,24 @@ namespace DirectoryTreeExplorer.ViewModel
         private readonly IterateDirectoryHelper _iterateDirectoryHelper;
         private readonly XmlCreator _xmlCreator;
 
+        public ICommand ClickCommandBrowseXml { get; set; }
+        public ICommand ClickCommandChooseDirectory { get; set; }
+
         public ObservableCollection<Node> Nodes { get; }
         public List<string> Logs { get; }
 
-        public ICommand ClickCommandBrowseXml { get; }
-        public ICommand ClickCommandChooseDirectory { get; }
+        public string XmlPath
+        {
+            get => _xmlPath;
+            set
+            {
+                if (_xmlPath == value)
+                    return;
+
+                _xmlPath = value;
+                OnPropertyChanged(nameof(XmlPath));
+            }
+        }
 
 
         public MainWindowViewModel(IDialogProvider folderBrowserDialogProvider)
@@ -45,21 +58,7 @@ namespace DirectoryTreeExplorer.ViewModel
 
             BindingOperations.EnableCollectionSynchronization(Nodes, _lock);
 
-            this.ClickCommandBrowseXml = new Command(this.ClickMethodBrowseXml);
-            this.ClickCommandChooseDirectory = new Command(this.ClickMethodChooseDirectory);
-        }
-
-        public string XmlPath
-        {
-            get => _xmlPath;
-            set
-            {
-                if (_xmlPath == value)
-                    return;
-
-                _xmlPath = value;
-                OnPropertyChanged(nameof(XmlPath));
-            }
+            InitializeCommands();
         }
 
         private void AddLog(string message)
@@ -137,6 +136,14 @@ namespace DirectoryTreeExplorer.ViewModel
             await Task.Run(() => FillNodes(_iterateDirectoryHelper.FoundDataForTreeView));
         }
 
+        #region Commands
+
+        private void InitializeCommands()
+        {
+            this.ClickCommandBrowseXml = new Command(this.ClickMethodBrowseXml);
+            this.ClickCommandChooseDirectory = new Command(this.ClickMethodChooseDirectory);
+        }
+
         private async void ClickMethodChooseDirectory()
         {
             var path = _dialogProvider.ShowFolderBrowserDialog();
@@ -160,5 +167,7 @@ namespace DirectoryTreeExplorer.ViewModel
         {
             XmlPath = _dialogProvider.SaveFileDialog();
         }
+
+        #endregion
     }
 }

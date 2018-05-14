@@ -126,17 +126,18 @@ namespace DirectoryTreeExplorer.Business
                     new XAttribute("Owner", directoryElement.Owner),
                     new XAttribute("Size", directoryElement.Size));
         }
-    }
 
-    public class XmlDirectoryItem
-    {
-        public XElement XmlElement { get; }
-        public long Size { get; set; }
 
-        public XmlDirectoryItem(XElement xmlElement, long size = 0)
+        private class XmlDirectoryItem
         {
-            XmlElement = xmlElement;
-            Size = size;
+            public XElement XmlElement { get; }
+            public long Size { get; set; }
+
+            public XmlDirectoryItem(XElement xmlElement, long size = 0)
+            {
+                XmlElement = xmlElement;
+                Size = size;
+            }
         }
     }
 }

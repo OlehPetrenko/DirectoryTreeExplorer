@@ -10,14 +10,14 @@ namespace DirectoryTreeExplorer.Business
     {
         private static readonly Lazy<GlobalCache> Lazy = new Lazy<GlobalCache>(() => new GlobalCache());
 
+        public static GlobalCache Instance => Lazy.Value; 
+
+        public Dictionary<string, string> Owners { get; }
+
+
         private GlobalCache()
         {
             Owners = new Dictionary<string, string>();
         }
-
-        public static GlobalCache Instance => Lazy.Value;
-
-
-        public Dictionary<string, string> Owners { get; }
     }
 }

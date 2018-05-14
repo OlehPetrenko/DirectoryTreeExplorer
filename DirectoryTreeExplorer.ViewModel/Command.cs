@@ -13,6 +13,7 @@ namespace DirectoryTreeExplorer.ViewModel
         public ActionDelegate ExecuteDelegate { get; set; }
         public Predicate<object> CanExecuteDelegate { get; set; }
 
+
         public Command(ActionDelegate action)
         {
             this.ExecuteDelegate = action;
