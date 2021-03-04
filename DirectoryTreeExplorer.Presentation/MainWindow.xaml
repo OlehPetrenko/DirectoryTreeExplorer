@@ -4,9 +4,55 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DirectoryTreeExplorer.Presentation"
+        xmlns:business="clr-namespace:DirectoryTreeExplorer.Business;assembly=DirectoryTreeExplorer.Business"
+        xmlns:converters="clr-namespace:DirectoryTreeExplorer.Presentation.Converters"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Directory Tree Explorer" Height="550" Width="900">
+
     <Grid>
-        
+        <Grid.Resources>
+            <converters:ListToStringConverter x:Key="ListToStringConverter" />
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TreeView x:Name="MainTreeView" Grid.Row="0" Margin="5" ItemsSource="{Binding Path=Nodes, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type business:Node}" ItemsSource="{Binding Path=Nodes}">
+                    <TextBlock Text="{Binding Name}" />
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40" />
+                <RowDefinition Height="40" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Row="0" Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="ChooseXmlFileTextBox" Grid.Column="0" Margin="5 0 5 5" VerticalContentAlignment="Center" 
+                         Text="{Binding Path=XmlPath, UpdateSourceTrigger=PropertyChanged}" />
+                <Button x:Name="ChooseXmlPathButton" Grid.Column="1" Margin="0 0 5 5" Width="80" Content="Browse XML" Command="{Binding ClickCommandBrowseXml}" />
+            </Grid>
+
+            <Button x:Name="ChooseDirectoryButton" Grid.Row="1" Grid.Column="0" Margin="5 0 5 5" Content="CHOOSE DIRECTORY" Command="{Binding ClickCommandChooseDirectory}" />
+
+            <TextBox x:Name="LogTextBox" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Margin="5 0 5 5" MinWidth="300" MaxWidth="300" TextWrapping="Wrap" IsReadOnly="True" 
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     Text="{Binding Path=Logs, Converter={StaticResource ListToStringConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+        </Grid>
     </Grid>
 </Window>

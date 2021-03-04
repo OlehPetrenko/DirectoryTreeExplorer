@@ -36,6 +36,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -62,6 +63,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Converters\ListToStringConverter.cs" />
+    <Compile Include="DialogProvider.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -95,11 +98,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DirectoryTreeExplorer.Business\DirectoryTreeExplorer.Business.csproj">
-      <Project>{5e8d4705-a1f3-4ff8-bd08-546f1bd1979c}</Project>
+      <Project>{2d075528-4862-47c5-842d-32bbdfb2032b}</Project>
       <Name>DirectoryTreeExplorer.Business</Name>
     </ProjectReference>
     <ProjectReference Include="..\DirectoryTreeExplorer.ViewModel\DirectoryTreeExplorer.ViewModel.csproj">
-      <Project>{dbd54bdf-2202-4887-94f3-f86ef34dcfb3}</Project>
+      <Project>{91e739ae-7c8c-41e8-89a3-9cc2d1a9d62a}</Project>
       <Name>DirectoryTreeExplorer.ViewModel</Name>
     </ProjectReference>
   </ItemGroup>
